@@ -7,6 +7,7 @@
 //
 
 #import "NSAttributedAlert.h"
+#import "SOPButton.h"
 
 static const int edgeInsetLeft = 20;
 static const int edgeInsetRight = 40;
@@ -25,7 +26,7 @@ static const int spacingy = 10;
     NSTextView * _informationview;
     NSView * _accessoryView;
     
-    NSButton * _defaultButton;
+    SOPButton * _defaultButton;
     NSMutableArray * _buttons;
     
     BOOL _needslayout;
@@ -33,28 +34,98 @@ static const int spacingy = 10;
 }
 
 #pragma -- Public Functions
-
+-(void)setupButtons
+{
+    NSSize buttonSize = NSMakeSize(14.f, 16.f);
+    INWindowButton * closeButton = [INWindowButton windowButtonWithSize:buttonSize groupIdentifier:nil];
+    INWindowButton * minimizeButton = [INWindowButton windowButtonWithSize:buttonSize groupIdentifier:nil];
+    INWindowButton * zoomButton = [INWindowButton windowButtonWithSize:buttonSize groupIdentifier:nil];
+    closeButton.activeImage = [NSImage imageNamed:@"lion-close-active-color"];
+    closeButton.activeNotKeyWindowImage = [NSImage imageNamed:@"lion-close-inactive-disabled-color"];
+    closeButton.inactiveImage = [NSImage imageNamed:@"lion-close-inactive-disabled-color"];
+    closeButton.pressedImage = [NSImage imageNamed:@"lion-close-pd-color"];
+    closeButton.rolloverImage = [NSImage imageNamed:@"lion-close-rollover-color"];
+    
+    zoomButton.activeImage = [NSImage imageNamed:@"lion-zoom-active-color"];
+    zoomButton.activeNotKeyWindowImage = [NSImage imageNamed:@"lion-zoom-inactive-disabled-color"];
+    zoomButton.inactiveImage = [NSImage imageNamed:@"lion-zoom-inactive-disabled-color"];
+    zoomButton.pressedImage = [NSImage imageNamed:@"lion-zoom-pd-color"];
+    zoomButton.rolloverImage = [NSImage imageNamed:@"lion-zoom-rollover-color"];
+    [zoomButton setEnabled:NO];
+    
+    minimizeButton.activeImage = [NSImage imageNamed:@"lion-minimize-active-color"];
+    minimizeButton.activeNotKeyWindowImage = [NSImage imageNamed:@"lion-minimize-inactive-disabled-color"];
+    minimizeButton.inactiveImage = [NSImage imageNamed:@"lion-minimize-inactive-disabled-color"];
+    minimizeButton.pressedImage = [NSImage imageNamed:@"lion-minimize-pd-color"];
+    minimizeButton.rolloverImage = [NSImage imageNamed:@"lion-minimize-rollover-color"];
+    [minimizeButton setEnabled:NO];
+    
+    self.closeButton = closeButton;
+    self.zoomButton = zoomButton;
+    self.minimizeButton = minimizeButton;
+    
+}
+-(void)windowWillClose:(NSNotification *)notification
+{
+    if (self.buttons && self.buttons.count >0)
+    {
+        [self selectButton:((NSButton *)self.buttons[0])];
+    }
+    else if (_defaultButton)
+    {
+        [self selectButton:_defaultButton];
+    }
+}
+-(void)performClose:(id)sender
+{
+    [super performClose:sender];
+}
 - (id) init
 {
-    NSRect rect = NSMakeRect(0, 0, 420, 200);
+    NSRect rect = NSMakeRect(0, 0, 421, 174);
     if ( self = [super initWithContentRect:rect
-                                 styleMask:NSTitledWindowMask
+                                 styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSNonactivatingPanelMask
                                    backing:NSBackingStoreBuffered
                                      defer:YES] )
     {
+        [self setDelegate:self];
         _needslayout = YES;
         _buttons = [NSMutableArray array];
-        
+        [self setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces
+                                    |NSWindowCollectionBehaviorTransient
+                                    |NSWindowCollectionBehaviorIgnoresCycle
+                                    |NSWindowCollectionBehaviorFullScreenAuxiliary];
         [self setWorksWhenModal:YES];
         [self setBecomesKeyOnlyIfNeeded:YES];
         [self setFloatingPanel:YES];
         [self setAnimationBehavior:NSWindowAnimationBehaviorAlertPanel];
         
+        [self setupButtons];
+        [self setOpaque:NO];
+        [self setBackgroundColor:[NSColor colorWithCalibratedRed:0.f green:0.f blue:0.f alpha:0.8f]] ;
+        self.titleBarHeight = 28.0;
+        self.trafficLightButtonsLeftMargin = 5.0;
+        self.trafficLightSeparation = 5.f;
+        self.titleBarDrawingBlock = ^(BOOL drawsAsMainWindow, CGRect drawingRect,CGPathRef clippingPath)
+        {
+            CGContextRef ctx = [[NSGraphicsContext currentContext] graphicsPort];
+            if (clippingPath) {
+                CGContextAddPath(ctx, clippingPath);
+                CGContextClip(ctx);
+            }
+            
+            [[NSColor colorWithCalibratedRed:0.f green:0.f blue:0.f alpha:9.f] drawSwatchInRect:drawingRect];
+            NSRectFill(NSMakeRect(NSMinX(drawingRect), NSMinY(drawingRect), NSWidth(drawingRect), 1));
+        };
+        
         _iconview = [[NSImageView alloc] initWithFrame:NSMakeRect(10, 120, 64, 64)];
         [_iconview setImage:[[NSApplication sharedApplication] applicationIconImage]];
         
+        NSFont * openSans = [NSFont fontWithName:@"OpenSans" size:18.f];
+        
         _messageview = [[NSTextView alloc] init];
-        [_messageview setFont:[NSFont boldSystemFontOfSize:[NSFont systemFontSize]]];
+        [_messageview setFont:openSans];
+        [_messageview setTextColor:[NSColor whiteColor]];
         [_messageview setFocusRingType:NSFocusRingTypeNone];
         [_messageview setDrawsBackground:NO];
         [_messageview setEditable:NO];
@@ -68,7 +139,8 @@ static const int spacingy = 10;
         [_messageview setHidden:YES];
         
         _informationview = [[NSTextView alloc] init];
-        [_informationview setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
+        [_informationview setFont:openSans];
+        [_informationview setTextColor:[NSColor whiteColor]];
         [_informationview setFocusRingType:NSFocusRingTypeNone];
         [_informationview setDrawsBackground:NO];
         [_informationview setEditable:NO];
@@ -131,13 +203,13 @@ static const int spacingy = 10;
 
 - (void) setMessageAttributedText:(NSAttributedString*)text
 {
-    [[_messageview textStorage] setValue:text];
+    [[_messageview textStorage] setAttributedString:text];
     [_messageview setHidden:[_messageview string] <= 0];
 }
 
 - (void) setInformativeText:(NSString*)text
 {
-    [[_informationview textStorage] setAttributedString:[[NSAttributedString alloc] initWithString:text]];
+    [_informationview setString:text];
     [_informationview setHidden:[_informationview string] <= 0];
 }
 
@@ -433,9 +505,9 @@ static const int spacingy = 10;
     return width;
 }
 
-- (NSButton*) createButtonWithTitle:(NSString*)title isKeyButton:(BOOL)makeKey
+- (SOPButton*) createButtonWithTitle:(NSString*)title isKeyButton:(BOOL)makeKey
 {
-    NSButton * button = [[NSButton alloc] init];
+    SOPButton * button = [[SOPButton alloc] init];
     [button setBezelStyle:NSRoundedBezelStyle];
     [button setButtonType:NSMomentaryPushInButton];
     [button setBordered:YES];

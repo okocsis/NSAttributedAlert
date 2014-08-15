@@ -7,8 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "INAppStoreWindow.h"
 
-@interface NSAttributedAlert : NSPanel
+@interface NSAttributedAlert : INAppStoreWindow<NSWindowDelegate>
 
 - (id) init;
 
