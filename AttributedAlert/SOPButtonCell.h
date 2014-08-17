@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface SOPButtonCell : NSButtonCell
-@property (nonatomic) BOOL isMosueOver;
+@property (atomic) BOOL isMosueOver;
 @property (nonatomic) BOOL isSOPFocused;
 
 @end

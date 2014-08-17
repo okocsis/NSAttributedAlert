@@ -9,15 +9,15 @@
 #import "NSAttributedAlert.h"
 #import "SOPButton.h"
 
-static const int edgeInsetLeft = 20;
-static const int edgeInsetRight = 40;
-static const int edgeInsetTop = 18;
+static const int kEdgeInsetLeft = 20;
+static const int kEdgeInsetRight = 40;
+static const int kEdgeInsetTop = 18;
 
-static const int edgeButtonsInsetBottom = 16;
-static const int edgeButtonsInsetRight = 16;
+static const int kEdgeButtonsInsetBottom = 16;
+static const int kEdgeButtonsInsetRight = 16;
 
-static const int spacingx = 20;
-static const int spacingy = 10;
+static const int kSpacingX = 20;
+static const int kSpacingY = 10;
 
 @implementation NSAttributedAlert
 {
@@ -334,21 +334,21 @@ static const int spacingy = 10;
     NSRect rect = [_contentView frame];
     float diff = [self frame].size.height - rect.size.height;
     
-    rect.size.height = edgeInsetTop;
+    rect.size.height = kEdgeInsetTop;
     if ( ![_messageview isHidden] )
     {
         rect.size.height += [_messageview frame].size.height;
-        rect.size.height += spacingy;
+        rect.size.height += kSpacingY;
     }
     if ( ![_informationview isHidden] )
     {
         rect.size.height += [_informationview frame].size.height;
-        rect.size.height += spacingy;
+        rect.size.height += kSpacingY;
     }
     if ( _accessoryView )
     {
         rect.size.height += [_accessoryView frame].size.height;
-        rect.size.height += spacingy;
+        rect.size.height += kSpacingY;
     }
     if ( [_buttons count] > 0 )
     {
@@ -358,7 +358,7 @@ static const int spacingy = 10;
     {
         rect.size.height += [_defaultButton frame].size.height;
     }
-    rect.size.height += edgeButtonsInsetBottom;
+    rect.size.height += kEdgeButtonsInsetBottom;
     [_contentView setFrame:rect];
     
     rect.size.height += diff;
@@ -369,7 +369,7 @@ static const int spacingy = 10;
 {
     NSRect rect = [_contentView frame];
 
-    CGPoint offset = CGPointMake(edgeInsetLeft, rect.size.height - edgeInsetTop);
+    CGPoint offset = CGPointMake(kEdgeInsetLeft, rect.size.height - kEdgeInsetTop);
     if ( [_iconview image] )
     {
         NSRect frame = [_iconview frame];
@@ -378,7 +378,7 @@ static const int spacingy = 10;
         [_iconview setFrame:frame];
         [_contentView addSubview:_iconview];
         
-        offset.x += frame.size.width + spacingx;
+        offset.x += frame.size.width + kSpacingX;
     }
     else
     {
@@ -393,7 +393,7 @@ static const int spacingy = 10;
         [_messageview setFrame:frame];
         [_contentView addSubview:_messageview];
 
-        offset.y -= frame.size.height + spacingy;
+        offset.y -= frame.size.height + kSpacingY;
     }
     else
     {
@@ -408,7 +408,7 @@ static const int spacingy = 10;
         [_informationview setFrame:frame];
         [_contentView addSubview:_informationview];
         
-        offset.y -= frame.size.height + spacingy;
+        offset.y -= frame.size.height + kSpacingY;
     }
     else
     {
@@ -423,7 +423,7 @@ static const int spacingy = 10;
         [_accessoryView setFrame:frame];
         [_contentView addSubview:_accessoryView];
         
-        offset.y -= frame.size.height + spacingy;
+        offset.y -= frame.size.height + kSpacingY;
     }
 }
 
@@ -453,17 +453,17 @@ static const int spacingy = 10;
 {
     NSRect rect = [_contentView frame];
 
-    CGPoint offset = CGPointMake(rect.size.width - edgeButtonsInsetRight, edgeButtonsInsetBottom);
+    CGPoint offset = CGPointMake(rect.size.width - kEdgeButtonsInsetRight, kEdgeButtonsInsetBottom);
     
     if ( [_buttons count] > 0 )
     {
-        for ( NSButton * button in _buttons )
+        for ( NSButton * buttonI in _buttons )
         {
-            NSRect frame = [button frame];
-            frame.origin.x = offset.x - frame.size.width;
+            NSRect frame = [buttonI frame];
+            frame.origin.x = offset.x - frame.size.width - kSpacingX;
             frame.origin.y = offset.y;
-            [button setFrame:frame];
-            [_contentView addSubview:button];
+            [buttonI setFrame:frame];
+            [_contentView addSubview:buttonI];
             
             offset.x = frame.origin.x;
         }
@@ -472,11 +472,11 @@ static const int spacingy = 10;
         {
             NSButton * button = [_buttons objectAtIndex:2];
             NSRect frame = [button frame];
-            frame.origin.x = edgeInsetRight - (edgeButtonsInsetRight / 2);
+            frame.origin.x = kEdgeInsetRight - (kEdgeButtonsInsetRight / 2);
             if ( [_iconview image] )
             {
                 frame.origin.x += [_iconview frame].size.width;
-                frame.origin.x += spacingx;
+                frame.origin.x += kSpacingX;
             }
             [button setFrame:frame];
         }
@@ -495,11 +495,11 @@ static const int spacingy = 10;
 {
     NSView * contentView = [self contentView];
     NSRect contentBounds = [contentView bounds];
-    float width = contentBounds.size.width - ( edgeInsetLeft + edgeInsetRight );
+    float width = contentBounds.size.width - ( kEdgeInsetLeft + kEdgeInsetRight );
     
     if ( [_iconview image] )
     {
-        width -= [_iconview bounds].size.width + spacingx;
+        width -= [_iconview bounds].size.width + kSpacingX;
     }
     
     return width;

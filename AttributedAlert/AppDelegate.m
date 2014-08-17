@@ -9,8 +9,8 @@
 #import "AppDelegate.h"
 #import "NSAttributedAlert.h"
 
-static NSString * message = @"This is an alert message";
-static NSString * information = @"This is the Informative Text.\n\nWith a link in it <a href=\"www.google.com\">Google</a>\n\ntext text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text";
+static NSString * message = @"Are you sure you want to quit? ";
+static NSString * information = @"";
 
 @implementation AppDelegate
 

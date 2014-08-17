@@ -9,7 +9,9 @@
 #import "SOPButton.h"
 #import "SOPButtonCell.h"
 
-
+@interface SOPButton()
+@property (nonatomic) NSTrackingArea* trackingArea;
+@end
 
 @implementation SOPButton
 
@@ -21,7 +23,6 @@
 }
 -(BOOL)isSOPFocused
 {
-    [self setNeedsDisplay:YES];
     return [(SOPButtonCell *)[self cell] isSOPFocused];
 }
 -(void)setupTrackingArea
@@ -30,11 +31,17 @@
     {
         return;
     }
-    NSTrackingArea* trackingArea = [[NSTrackingArea alloc]
-                                    initWithRect:[[[self cell] controlView] frame]
-                                   options:NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways
-                                   owner:self userInfo:nil];
-    [self addTrackingArea:trackingArea];
+    if (_trackingArea)
+    {
+        [self removeTrackingArea:_trackingArea];
+    }
+    _trackingArea = [[NSTrackingArea alloc]
+                                    initWithRect:[self bounds]
+                                    options:NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways
+                                    owner:self
+                                    userInfo:nil];
+
+    [self addTrackingArea:_trackingArea];
 }
 -(void)preSetup
 {
@@ -42,7 +49,6 @@
 }
 -(void)awakeFromNib
 {
-    [self preSetup];
     [super awakeFromNib];
     [self setupTrackingArea];
     
@@ -58,6 +64,18 @@
     }
     return self;
 }
+-(void)setKeyEquivalent:(NSString *)charCode
+{
+    if ([charCode isEqualToString:@"\r"])
+    {
+        self.isSOPFocused = YES;
+    }
+    else
+    {
+        self.isSOPFocused = NO;
+    }
+    [super setKeyEquivalent:charCode];
+}
 
 - (void)drawRect:(NSRect)dirtyRect
 {
@@ -71,17 +89,18 @@
     [self setupTrackingArea];
 }
 
-- (void)mouseEntered:(NSEvent *)theEvent{
-    NSLog(@"entered");
-    [[self cell] setIsMosueOver:YES];
-    
-    
+- (void)mouseEntered:(NSEvent *)theEvent
+{
+    [self setNeedsDisplay:YES];
+    [(SOPButtonCell *)[self cell] setIsMosueOver:YES];
+    NSLog(@"enter :: %@",self);
 }
 
-- (void)mouseExited:(NSEvent *)theEvent{
-    [[self cell] setIsMosueOver:NO];
-    NSLog(@"exited");
-    
+- (void)mouseExited:(NSEvent *)theEvent
+{
+    [self setNeedsDisplay:YES];
+    [(SOPButtonCell *)[self cell] setIsMosueOver:NO];
+    NSLog(@"exit :: %@",self);
 }
 
 @end
