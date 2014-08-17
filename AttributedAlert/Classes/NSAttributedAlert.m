@@ -118,10 +118,11 @@ static const int kSpacingY = 10;
             NSRectFill(NSMakeRect(NSMinX(drawingRect), NSMinY(drawingRect), NSWidth(drawingRect), 1));
         };
         
-        _iconview = [[NSImageView alloc] initWithFrame:NSMakeRect(10, 120, 64, 64)];
-        [_iconview setImage:[[NSApplication sharedApplication] applicationIconImage]];
+//        _iconview = [[NSImageView alloc] initWithFrame:NSMakeRect(10, 120, 64, 64)];
+//        [_iconview setImage:[[NSApplication sharedApplication] applicationIconImage]];
         
         NSFont * openSans = [NSFont fontWithName:@"OpenSans" size:18.f];
+        NSFont * openSansSmall = [NSFont fontWithName:@"OpenSans" size:14.f];
         
         _messageview = [[NSTextView alloc] init];
         [_messageview setFont:openSans];
@@ -134,12 +135,13 @@ static const int kSpacingY = 10;
         [_messageview setVerticallyResizable:YES];
         [_messageview setTextContainerInset:NSZeroSize];
         [[_messageview textContainer] setLineFragmentPadding:0.0f];
+        [_messageview setAlignment:NSCenterTextAlignment];
         [_messageview setToolTip:@""];
-        [_messageview setFrame:NSMakeRect(84, 150, 300, 30)];
+        [_messageview setFrame:NSMakeRect(NSMidX(self.frame) - (300/2), 150, 300, 30)];
         [_messageview setHidden:YES];
         
         _informationview = [[NSTextView alloc] init];
-        [_informationview setFont:openSans];
+        [_informationview setFont:openSansSmall];
         [_informationview setTextColor:[NSColor whiteColor]];
         [_informationview setFocusRingType:NSFocusRingTypeNone];
         [_informationview setDrawsBackground:NO];
@@ -149,8 +151,9 @@ static const int kSpacingY = 10;
         [_informationview setVerticallyResizable:YES];
         [_informationview setTextContainerInset:NSZeroSize];
         [[_informationview textContainer] setLineFragmentPadding:0.0f];
+        [_informationview setAlignment:NSCenterTextAlignment];
         [_informationview setToolTip:@""];
-        [_informationview setFrame:NSMakeRect(84, 100, 300, 100)];
+        [_informationview setFrame:NSMakeRect(NSMidX(self.frame) - (300/2), 100, 300, 100)];
         [_informationview setAutoresizingMask:NSViewHeightSizable];
         [_informationview setHidden:YES];
         
@@ -388,7 +391,7 @@ static const int kSpacingY = 10;
     if ( ![_messageview isHidden] )
     {
         NSRect frame = [_messageview frame];
-        frame.origin.x = offset.x;
+        frame.origin.x = NSMidX(rect)-(frame.size.width/2);
         frame.origin.y = offset.y - frame.size.height;
         [_messageview setFrame:frame];
         [_contentView addSubview:_messageview];
@@ -457,34 +460,30 @@ static const int kSpacingY = 10;
     
     if ( [_buttons count] > 0 )
     {
+        CGFloat widthForAllButtons = 0.f;
         for ( NSButton * buttonI in _buttons )
         {
+            widthForAllButtons += buttonI.frame.size.width +kSpacingX;
+        }
+        widthForAllButtons -= kSpacingX; //subtracting last spacing
+        CGFloat nextXPos = NSMidX(rect) - (widthForAllButtons/2.f);
+        for (NSInteger i = ([_buttons count]-1) ; i >= 0; --i )
+        {
+            NSButton * buttonI = _buttons[i];
             NSRect frame = [buttonI frame];
-            frame.origin.x = offset.x - frame.size.width - kSpacingX;
+            frame.origin.x = nextXPos;
             frame.origin.y = offset.y;
             [buttonI setFrame:frame];
             [_contentView addSubview:buttonI];
             
-            offset.x = frame.origin.x;
-        }
-        
-        if ( [_buttons count] == 3 )
-        {
-            NSButton * button = [_buttons objectAtIndex:2];
-            NSRect frame = [button frame];
-            frame.origin.x = kEdgeInsetRight - (kEdgeButtonsInsetRight / 2);
-            if ( [_iconview image] )
-            {
-                frame.origin.x += [_iconview frame].size.width;
-                frame.origin.x += kSpacingX;
-            }
-            [button setFrame:frame];
+            nextXPos += frame.size.width + kSpacingX;
+
         }
     }
     else
     {
         NSRect frame = [_defaultButton frame];
-        frame.origin.x = offset.x - frame.size.width;
+        frame.origin.x = NSMidX(rect) - (frame.size.width/2.f);
         frame.origin.y = offset.y;
         [_defaultButton setFrame:frame];
         [_contentView addSubview:_defaultButton];
