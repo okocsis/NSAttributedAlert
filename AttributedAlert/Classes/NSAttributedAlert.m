@@ -82,7 +82,7 @@ static const int kSpacingY = 10;
 }
 - (id) init
 {
-    NSRect rect = NSMakeRect(0, 0, 421, 174);
+    NSRect rect = NSMakeRect(0, 0, 420, 174);
     if ( self = [super initWithContentRect:rect
                                  styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSNonactivatingPanelMask
                                    backing:NSBackingStoreBuffered
